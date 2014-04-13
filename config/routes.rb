@@ -1,4 +1,14 @@
 Rails.application.routes.draw do
+  get 'taxi_game/Description'
+
+  get 'taxi_game/Play'
+
+  get 'taxi_game/Questionnaire'
+
+  get 'taxi_game/Summary'
+
+  resources :users
+
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 
