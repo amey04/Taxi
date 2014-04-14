@@ -7,6 +7,8 @@ Rails.application.routes.draw do
 
   get 'taxi_game/Summary'
 
+  post 'taxi_game/storedata'
+  
   resources :users
 
   # The priority is based upon order of creation: first created -> highest priority.

@@ -10,4 +10,11 @@ class TaxiGameController < ApplicationController
 
   def Summary
   end
+  
+  def storedata
+    logger.debug "\n#{params[:steps]}}\n"
+    ar = JSON.parse(params[:steps])
+    uid = user.id
+    render nothing: true
+  end
 end

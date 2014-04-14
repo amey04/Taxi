@@ -111,6 +111,9 @@
 			walls.push(wall5);
 			walls.push(wall6);
 			
+			// Variable to store actions taken by user in a session
+			var steps = [];
+			
 			var passenger_row = 3;
 			var destination_row = 0;
 			var wall_north_row = 4;
@@ -131,17 +134,17 @@
     			actions[i] = actions[a];
     			++i;
 			}
+
+			function sendStepsToServer() {
+				alert("Sending Data to Server");
+				$.ajax({
+                	type: "POST",
+                    url: "/taxi_game/storedata",
+                    data: {steps: JSON.stringify(steps)},
+                    success: function() { alert("Success!"); }
+                });
+			}
 			
-        	/*function shuffleActions {
-        		var cnt=actions.length, index, tmp;
-        		while (cnt > 0) {
-        			index = Math.floor(Math.random() * cnt);
-        			cnt--;
-        			tmp = actions[cnt];
-        			actions[cnt] = actions[index];
-        			actions[index] = tmp;
-        		}
-        	}*/
         	function printSummary() {
         		var wall_on_east = {
 					x: 4,
@@ -165,14 +168,6 @@
 				 */
 				var tab = document.getElementById("summary").rows[destination_row].cells;
 				tab[1].innerHTML = "( "+(destination_location.x-taxi_location.x)+", "+(destination_location.y-taxi_location.y)+" )";
-				
-        		/*
-        		 * Print Taxi features
-        		 */
-        		/*var tab = document.getElementById("summary").rows[1].cells;
-        		tab[3].innerHTML=is_touching_n+'<br>'+is_touching_e+'<br>'+is_touching_w+'<br>'+is_touching_s;
-        		tab[1].innerHTML="( "+taxi_location.x+", "+taxi_location.y+" )";
-        		*/
         		/*
         		 * Print passenger location
         		 */
@@ -242,6 +237,7 @@
         			is_touching_w = false;
         		}
         		alert("Action: Go West");
+        		steps.push("go_west");
         		printSummary();
         	}
         	
@@ -260,6 +256,7 @@
         			is_touching_e = false;
         		}
         		alert("Action: Go East");
+        		steps.push("go_east");
         		printSummary();
         	}
         	
@@ -278,6 +275,7 @@
         			is_touching_n = false;
         		}
         		alert("Action: Go North");
+        		steps.push("go_north");
         		printSummary();
         	} 
         	function action4() { //go south
@@ -295,6 +293,7 @@
         		else {
         			is_touching_s = false;
         		}
+        		steps.push("go_south");
         		printSummary();
         	} 
         	
@@ -303,13 +302,18 @@
         		if(taxi_location.x == passanger_location.x && taxi_location.y == passanger_location.y) {
         			is_in_taxi=true;
         		}
+        		steps.push("pickup");
         		printSummary();
         	} 
         	function action6() { //drop off
         		alert("Action: Drop-off");
+        		steps.push("drop-off");
+        		sendStepsToServer();
+
         		if(destination_location.x == taxi_location.x && destination_location.y == taxi_location.y) {
         			if(is_in_taxi == true) {
         				is_in_taxi = false;
+        				sendStepsToServer();
         				alert("- SUCCESS -");
         				location.reload();
         			}
