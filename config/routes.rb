@@ -1,4 +1,26 @@
 Rails.application.routes.draw do
+  get 'games/Description'
+
+  get 'games/Play'
+
+  get 'games/Summary'
+
+  get 'games/Questions'
+
+  get 'game/Summary'
+
+  get 'game/Questions'
+
+  post 'games/storedata'
+  
+  post "games/new"
+  
+  resources :games
+
+  get 'game/Description'
+
+  get 'game/Play'
+  
   get 'taxi_game/Description'
 
   get 'taxi_game/Play'

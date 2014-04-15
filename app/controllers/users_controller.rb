@@ -27,7 +27,7 @@ class UsersController < ApplicationController
   # POST /users.json
   def create
     @user = User.new(user_params)
-    @post = "/taxi_game/Description"
+    @post = "/games/Description"
     logger.debug "\n#{params[:user_params]}}\n"
     respond_to do |format|
       if @user.save
