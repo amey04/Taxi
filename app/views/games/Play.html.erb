@@ -8,8 +8,7 @@
     	</div>
     	
         <div class="wrapper" align="center" style="padding-top: 10px">
-            <canvas align="center" id="game" width="400" height="10" tabindex="1"></canvas>
-            
+            <canvas align="center" id="game" width="400" height="10" tabindex="0"></canvas>
             <style type="text/css">
 .tg  {border-collapse:collapse;border-spacing:0;}
 .tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;}
@@ -22,7 +21,8 @@
     <th class="tg-s6z2" colspan="2">(-3, 3)</th>
   </tr>
   <tr>
-    <td class="tg-031e" colspan="4"></td>
+    <th class="tg-s6z2" colspan="2">Reward</th>
+    <th class="tg-s6z2" colspan="2">0</th>
   </tr>
   <tr>
     <td class="tg-s6z2">Object</td>
@@ -67,6 +67,18 @@
 
         	/*var actions = new Array("action1", "2", "3", "4", "5", "6");
         	*/
+        	/*
+        	 * Reward values are assigned as per follows
+        	 * Reward -1 on each step
+        	 * Reward +20 on valid drop-off
+        	 * Reward -10 on wrong pickup and drop-off
+        	 * Change these values for different reward structure
+        	 */
+        	var reward = 0; //Store current reward
+        	var reward_each_step = -1;
+        	var reward_correct_dropoff = 20;
+        	var reward_wrong_pickup_dropoff = -10;
+        	
 			var taxi_location = {
 				x: 3,
 				y: 1
@@ -114,9 +126,15 @@
 			// Variable to store actions taken by user in a session
 			var steps = [];
 			
+			/*
+			 * Following variables denotes row number of object in the table displayed to user
+			 * Modify here if table layout is changed
+			 */
 			var passenger_row = 3;
 			var destination_row = 0;
 			var wall_north_row = 4;
+			var reward_row = 1;
+			
 			
 			var is_touching_n=false, is_touching_s=false, is_touching_w=false, is_touching_e=false;
 			var is_in_taxi=false;
@@ -168,6 +186,12 @@
 				 */
 				var tab = document.getElementById("summary").rows[destination_row].cells;
 				tab[1].innerHTML = "( "+(destination_location.x-taxi_location.x)+", "+(destination_location.y-taxi_location.y)+" )";
+				
+				/*
+				 * Print reward value
+				 */
+				tab = document.getElementById("summary").rows[reward_row].cells;
+				tab[1].innerHTML = reward;
         		/*
         		 * Print passenger location
         		 */
@@ -238,6 +262,7 @@
         		}
         		alert("Action: Go West");
         		steps.push("go_west");
+        		reward += reward_each_step;
         		printSummary();
         	}
         	
@@ -257,6 +282,7 @@
         		}
         		alert("Action: Go East");
         		steps.push("go_east");
+        		reward += reward_each_step;
         		printSummary();
         	}
         	
@@ -276,6 +302,7 @@
         		}
         		alert("Action: Go North");
         		steps.push("go_north");
+        		reward += reward_each_step;
         		printSummary();
         	} 
         	function action4() { //go south
@@ -294,30 +321,43 @@
         			is_touching_s = false;
         		}
         		steps.push("go_south");
+        		reward += reward_each_step;
         		printSummary();
         	} 
         	
         	function action5() { // pickup
         		alert("Action: Pickup");
         		if(taxi_location.x == passanger_location.x && taxi_location.y == passanger_location.y) {
+        			reward += reward_each_step;
         			is_in_taxi=true;
         		}
+        		else {
+        			reward += reward_wrong_pickup_dropoff;
+        		}
+        		
         		steps.push("pickup");
         		printSummary();
         	} 
         	function action6() { //drop off
         		alert("Action: Drop-off");
         		steps.push("drop-off");
-        		sendStepsToServer();
 
         		if(destination_location.x == taxi_location.x && destination_location.y == taxi_location.y) {
         			if(is_in_taxi == true) {
+        				reward += reward_correct_dropoff;
         				is_in_taxi = false;
         				sendStepsToServer();
         				alert("- SUCCESS -");
         				location.reload();
         			}
+        			else {
+        				reward += reward_wrong_pickup_dropoff;
+        			}
         		}
+        		else {
+        			reward += reward_wrong_pickup_dropoff;
+        		}
+        		
         		printSummary();
         	}
         	
@@ -351,7 +391,10 @@
 					actions[i] = actions1[i++];
 				}
 			}
-			
+
+		/*
+		 * Listen for keypress event
+		 */
         var el = document.getElementById("game");
 		el.onkeydown = function(evt) {
                 evt = evt || window.event;
@@ -378,11 +421,6 @@
                 	shuffle();
                 }
             };
-
-            /*el.onkeyup = function(evt) {
-                evt = evt || window.event;
-                alert("keyup: " + evt.keyCode);
-            };*/
         </script>
     </body>
 </html>
