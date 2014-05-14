@@ -282,6 +282,7 @@
         				is_in_taxi = false;
         				sendStepsToServer();
         				alert("- SUCCESS -");
+        				//shuffle
         				location.reload();
         			}
         			else {
